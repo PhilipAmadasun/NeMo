@@ -198,7 +198,7 @@ class VitsModel(TextToWaveform):
             "max_len": NeuralType(('B',), IntType(), optional=True),
         }
     )
-    def forward(self, tokens, speakers=None, noise_scale=1, length_scale=1, noise_scale_w=1.0, max_len=1000):
+    def forward(self, tokens, speakers=None, noise_scale=1, length_scale=1, noise_scale_w=1.0, max_len=50000):
         text_len = torch.tensor([tokens.size(-1)]).to(int).to(tokens.device)
         audio_pred, attn, y_mask, (z, z_p, m_p, logs_p) = self.net_g.infer(
             tokens,
@@ -308,7 +308,7 @@ class VitsModel(TextToWaveform):
         else:
             (audio, audio_len, text, text_len) = batch
 
-        audio_pred, _, mask, *_ = self.net_g.infer(text, text_len, speakers, max_len=1000)
+        audio_pred, _, mask, *_ = self.net_g.infer(text, text_len, speakers, max_len=50000)
 
         audio_pred = audio_pred.squeeze()
         audio_pred_len = mask.sum([1, 2]).long() * self._cfg.validation_ds.dataset.hop_length
